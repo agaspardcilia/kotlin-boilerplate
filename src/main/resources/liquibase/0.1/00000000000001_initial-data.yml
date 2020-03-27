@@ -1,0 +1,15 @@
+databaseChangeLog:
+- changeSet:
+    id: 00000000000001-1
+    author: alexandre
+    changes:
+      - loadData:
+          file: data/users.csv
+          separator: ;
+          tableName: app_user
+          relativeToChangelogFile: true
+      - loadData:
+          file: data/authorities.csv
+          separator: ;
+          tableName: user_authority
+          relativeToChangelogFile: true

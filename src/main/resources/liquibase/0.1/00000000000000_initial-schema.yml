@@ -1,0 +1,104 @@
+databaseChangeLog:
+  - changeSet:
+      id: 00000000000000-1
+      author: alexandre (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: activation_keyPK
+                  name: id
+                  type: UUID
+              - column:
+                  name: creation_date
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: user_id
+                  type: UUID
+            tableName: activation_key
+  - changeSet:
+      id: 00000000000000-2
+      author: alexandre (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: app_userPK
+                  name: id
+                  type: UUID
+              - column:
+                  name: creation_date
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: firstname
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: is_active
+                  type: BOOLEAN
+              - column:
+                  name: lastname
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: mail
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  name: update_date
+                  type: TIMESTAMP WITHOUT TIME ZONE
+            tableName: app_user
+  - changeSet:
+      id: 00000000000000-3
+      author: alexandre (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: UUID
+              - column:
+                  name: authorities
+                  type: VARCHAR(255)
+            tableName: user_authority
+  - changeSet:
+      id: 00000000000000-4
+      author: alexandre (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: activation_key
+            constraintName: FK92osif6vxm3w6vdctglb2xxau
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: app_user
+            validate: true
+  - changeSet:
+      id: 00000000000000-5
+      author: alexandre (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: user_authority
+            constraintName: FKeoyor0ywyy3m5xntqmjvah310
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: app_user
+            validate: true
+
