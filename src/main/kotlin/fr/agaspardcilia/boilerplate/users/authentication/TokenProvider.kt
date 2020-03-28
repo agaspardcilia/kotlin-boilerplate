@@ -1,4 +1,4 @@
-package fr.agaspardcilia.boilerplate.users.jwt
+package fr.agaspardcilia.boilerplate.users.authentication
 
 import fr.agaspardcilia.boilerplate.config.properties.ApplicationProperties
 import io.jsonwebtoken.JwtException

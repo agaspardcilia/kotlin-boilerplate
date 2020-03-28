@@ -1,8 +1,8 @@
 package fr.agaspardcilia.boilerplate.config
 
 import fr.agaspardcilia.boilerplate.users.Authority
-import fr.agaspardcilia.boilerplate.users.jwt.JWTConfigurer
-import fr.agaspardcilia.boilerplate.users.jwt.TokenProvider
+import fr.agaspardcilia.boilerplate.users.authentication.JWTConfigurer
+import fr.agaspardcilia.boilerplate.users.authentication.TokenProvider
 import org.springframework.beans.factory.BeanInitializationException
 import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpMethod
@@ -71,6 +71,7 @@ open class SecurityConfiguration(
             .authorizeRequests()
             .antMatchers("/api/authenticate").permitAll()
             .antMatchers("/api/users/register").permitAll()
+            .antMatchers("/api/users/password").permitAll()
             .antMatchers("/api/users/activate/*").permitAll()
             .antMatchers("/api/users/current-user").authenticated()
             .antMatchers("/api/users/**").hasAnyAuthority(Authority.ADMIN.name)
@@ -83,7 +84,7 @@ open class SecurityConfiguration(
     private fun securityConfigurerAdapter() = JWTConfigurer(tokenProvider)
 
     @Bean
-    override fun authenticationManagerBean(): AuthenticationManager? = super.authenticationManagerBean()
+    override fun authenticationManagerBean(): AuthenticationManager = super.authenticationManagerBean()
 
 }
 

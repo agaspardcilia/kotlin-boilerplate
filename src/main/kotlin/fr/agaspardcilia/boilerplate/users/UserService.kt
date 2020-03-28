@@ -1,11 +1,12 @@
 package fr.agaspardcilia.boilerplate.users
 
-import fr.agaspardcilia.boilerplate.users.dto.UserCreationDto
-import fr.agaspardcilia.boilerplate.users.dto.UserDto
-import fr.agaspardcilia.boilerplate.users.dto.toDto
-import fr.agaspardcilia.boilerplate.users.dto.toEntity
+import fr.agaspardcilia.boilerplate.config.properties.ApplicationProperties
+import fr.agaspardcilia.boilerplate.mail.IMailService
+import fr.agaspardcilia.boilerplate.mail.MailDto
+import fr.agaspardcilia.boilerplate.users.dto.*
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -15,7 +16,9 @@ import java.util.*
 open class UserService(
     private val userRepository: UserRepository,
     private val activationKeyRepository: ActivationKeyRepository,
-    private val passwordEncoder: PasswordEncoder
+    private val passwordEncoder: PasswordEncoder,
+    private val applicationProperties: ApplicationProperties,
+    private val mailService: IMailService
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -40,6 +43,7 @@ open class UserService(
         val activationKey = createAndSaveActivationKey(result)
 
         log.debug("Registering ${user.mail} with ${activationKey.id} as his activation key!")
+        sendUserRegistrationMail(result, activationKey)
 
         return result.toDto()
     }
@@ -63,7 +67,40 @@ open class UserService(
         }
     }
 
+    fun changePassword(paswordChangeDto: PasswordChangeDto) =
+        when (val user = userRepository.findByMail(paswordChangeDto.username)) {
+            null -> throw UserNotFoundException()
+            else -> {
+                if (!passwordEncoder.matches(paswordChangeDto.oldPassword, user.password)) {
+                    throw BadCredentialsException("Wrong username/password combination!")
+                }
+
+                user.password = passwordEncoder.encode(paswordChangeDto.newPassword)
+
+                userRepository.save(user)
+            }
+        }
+
+
     private fun createAndSaveActivationKey(user: User): ActivationKey {
         return activationKeyRepository.save(ActivationKey(user = user))
+    }
+
+    private fun sendUserRegistrationMail(user: User, activationKey: ActivationKey) {
+        val mail = MailDto(
+            from = applicationProperties.mail.server.mailAddress,
+            to = user.mail!!,
+            subject = "Confirm account creation",
+            content =
+            """
+                Hello,
+
+                An account has been created using this mail address, go to ${applicationProperties.mail.server.url}/users/activate/${activationKey.id} to activate it!
+
+                Have a nice day.
+            """.trimIndent()
+        )
+
+        mailService.sendMail(mail)
     }
 }

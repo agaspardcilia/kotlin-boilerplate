@@ -1,5 +1,6 @@
 package fr.agaspardcilia.boilerplate.users
 
+import fr.agaspardcilia.boilerplate.users.dto.PasswordChangeDto
 import fr.agaspardcilia.boilerplate.users.dto.UserCreationDto
 import fr.agaspardcilia.boilerplate.users.dto.UserDto
 import org.slf4j.LoggerFactory
@@ -49,5 +50,11 @@ class UserController(
     fun activateUser(@PathVariable key: String) {
         log.info("Activating user with key {}", key)
         userService.activateUser(key)
+    }
+
+    @PutMapping("/password")
+    fun changePassword(@RequestBody @Valid passwordChangeDto: PasswordChangeDto) {
+        log.info("Attempting to change ${passwordChangeDto.username}'s password")
+        userService.changePassword(passwordChangeDto)
     }
 }

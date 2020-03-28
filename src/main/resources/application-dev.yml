@@ -16,8 +16,16 @@ spring:
     show-sql: true
   liquibase:
     contexts: dev
+#  mail:
+#    host: <mail host>
+#    port: 25
+#    protocol: smtp
 
 application:
+  mail:
+    server:
+      url: http://localhost:8080
+      mailAddress: <noreply@local.fr>
   security:
     jwt:
       secret: M2Y4N2YxNmY0Y2E3NDQ2ZmQxOWExM2U1MDhmYTUxODI4MmE4NWNmNWVkZTRhNGUwNzczYjBkZDA5ZDAyZjE2NjVlNDUwZTEyNjViYmFkZDQ5YzkwNGVmMzc2NTRiMDgyODdhYmY4Y2Q0YmM4NGRiNzJlMWZiYjM4ZDZjOTI5Mzg=

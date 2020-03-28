@@ -12,14 +12,5 @@ class Security {
         var tokenValidityInSeconds by Delegates.notNull<Long>()
         var tokenValidityInSecondsForRememberMe by Delegates.notNull<Long>()
     }
-
-//    class Cors {
-//        var allowedOrigins: String? = null
-//        lateinit var allowedMethods: String
-//        lateinit var allowedHeaders: String
-//        lateinit var exposedHeaders: String
-//        var allowCredentials by Delegates.notNull<Boolean>()
-//        var maxAge by Delegates.notNull<Long>()
-//    }
 }
 

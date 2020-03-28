@@ -1,5 +1,9 @@
-package fr.agaspardcilia.boilerplate.users
+package fr.agaspardcilia.boilerplate.users.authentication
 
+import fr.agaspardcilia.boilerplate.users.User
+import fr.agaspardcilia.boilerplate.users.UserNotActivatedException
+import fr.agaspardcilia.boilerplate.users.UserNotFoundException
+import fr.agaspardcilia.boilerplate.users.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails

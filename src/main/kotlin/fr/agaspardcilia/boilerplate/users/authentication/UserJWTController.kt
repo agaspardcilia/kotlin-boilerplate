@@ -1,9 +1,7 @@
-package fr.agaspardcilia.boilerplate.users
+package fr.agaspardcilia.boilerplate.users.authentication
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import fr.agaspardcilia.boilerplate.users.dto.LoginDto
-import fr.agaspardcilia.boilerplate.users.jwt.JWTAuthenticationService
-import fr.agaspardcilia.boilerplate.users.jwt.JWTFilter
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

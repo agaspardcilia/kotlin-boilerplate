@@ -1,4 +1,4 @@
-package fr.agaspardcilia.boilerplate.users.jwt
+package fr.agaspardcilia.boilerplate.users.authentication
 
 import fr.agaspardcilia.boilerplate.users.AuthenticationException
 import fr.agaspardcilia.boilerplate.users.UserNotActivatedException
