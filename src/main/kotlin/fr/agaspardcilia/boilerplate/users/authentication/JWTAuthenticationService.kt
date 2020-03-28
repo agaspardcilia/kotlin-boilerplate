@@ -21,7 +21,7 @@ class JWTAuthenticationService(
     @Throws(AuthenticationException::class)
     fun authenticateWithJWT(loginDto: LoginDto): String {
         val authentication: Authentication = this.authenticationManager.authenticate(UsernamePasswordAuthenticationToken(loginDto.username, loginDto.password))
-        when (val user: UserDto? = userService.getByMail(loginDto.username)) {
+        when (val user: UserDto? = userService.getByMail(loginDto.username!!)) {
             null -> throw AuthenticationException("Wrong username/password combination!")
             else -> {
                 if (!user.isActive) {

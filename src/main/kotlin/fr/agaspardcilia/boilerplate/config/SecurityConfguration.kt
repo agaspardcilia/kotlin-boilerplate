@@ -73,6 +73,8 @@ open class SecurityConfiguration(
             .antMatchers("/api/users/register").permitAll()
             .antMatchers("/api/users/password").permitAll()
             .antMatchers("/api/users/activate/*").permitAll()
+            .antMatchers("/api/users/forgotten/*").permitAll()
+            .antMatchers("/api/users/reset").permitAll()
             .antMatchers("/api/users/current-user").authenticated()
             .antMatchers("/api/users/**").hasAnyAuthority(Authority.ADMIN.name)
             .antMatchers("/api/**").authenticated()

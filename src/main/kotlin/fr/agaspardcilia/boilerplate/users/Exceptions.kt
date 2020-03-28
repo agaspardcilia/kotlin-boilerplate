@@ -6,4 +6,6 @@ class UserNotFoundException: Exception()
 
 class UserNotActivatedException(userMail: String? = "ukn"): Exception("User $userMail is not activated!")
 
+class InvalidTokenException: Exception()
+
 class AuthenticationException(message: String): Exception(message)

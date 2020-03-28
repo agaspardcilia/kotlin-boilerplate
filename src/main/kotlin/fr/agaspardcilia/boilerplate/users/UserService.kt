@@ -13,13 +13,17 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-open class UserService(
+class UserService(
     private val userRepository: UserRepository,
     private val activationKeyRepository: ActivationKeyRepository,
+    private val forgottenPasswordTokenRepository: ForgottenPasswordTokenRepository,
+
+    private val mailService: IMailService,
+
     private val passwordEncoder: PasswordEncoder,
-    private val applicationProperties: ApplicationProperties,
-    private val mailService: IMailService
+    private val applicationProperties: ApplicationProperties
 ) {
+
     private val log = LoggerFactory.getLogger(javaClass)
 
     fun get(id: UUID): UserDto? = userRepository.findByIdOrNull(id).let { it?.toDto() }
@@ -30,9 +34,9 @@ open class UserService(
 
     fun getAll(): List<UserDto> = userRepository.findAll().map { it.toDto() }
 
-    open fun registerUser(user: UserCreationDto): UserDto {
+    fun registerUser(user: UserCreationDto): UserDto {
         val toSave: User = user.toEntity()
-        if (doesExistByMail(user.mail)) {
+        if (doesExistByMail(user.mail!!)) {
             throw MailAlreadyInUserException()
         }
 
@@ -57,30 +61,47 @@ open class UserService(
 
     fun activateUser(activationKeyId: String) {
         val activationKey = activationKeyRepository.findById(UUID.fromString(activationKeyId))
-            .orElseThrow { UserNotFoundException() }
+            .orElseThrow { InvalidTokenException() }
         val user = activationKey.user
+            ?: throw UserNotFoundException()
 
-        if (user != null) {
-            user.isActive = true
-            userRepository.save(user)
-            activationKeyRepository.delete(activationKey)
-        }
+        user.isActive = true
+        userRepository.save(user)
+        activationKeyRepository.delete(activationKey)
+
     }
 
-    fun changePassword(paswordChangeDto: PasswordChangeDto) =
-        when (val user = userRepository.findByMail(paswordChangeDto.username)) {
-            null -> throw UserNotFoundException()
-            else -> {
-                if (!passwordEncoder.matches(paswordChangeDto.oldPassword, user.password)) {
-                    throw BadCredentialsException("Wrong username/password combination!")
-                }
+    fun changePassword(paswordChangeDto: PasswordChangeDto): UserDto {
+        val user = userRepository.findByMail(paswordChangeDto.username!!)
+            ?: throw UserNotFoundException()
 
-                user.password = passwordEncoder.encode(paswordChangeDto.newPassword)
-
-                userRepository.save(user)
-            }
+        if (!passwordEncoder.matches(paswordChangeDto.oldPassword, user.password)) {
+            throw BadCredentialsException("Wrong username/password combination!")
         }
 
+        user.password = passwordEncoder.encode(paswordChangeDto.newPassword)
+        return userRepository.save(user).toDto()
+    }
+
+
+    fun changePassword(forgottenPasswordDto: ForgottenPasswordDto): UserDto {
+        val forgottenPasswordToken = forgottenPasswordTokenRepository.findById(UUID.fromString(forgottenPasswordDto.token))
+            .orElseThrow { InvalidTokenException() }
+        val user = forgottenPasswordToken.user
+            ?: throw UserNotFoundException()
+
+        user.password = passwordEncoder.encode(forgottenPasswordDto.newPassword)
+
+        forgottenPasswordTokenRepository.delete(forgottenPasswordToken)
+        return userRepository.save(user).toDto()
+    }
+
+    fun createPasswordResetTokenAndSendMail(mail: String) {
+        val user = userRepository.findByMail(mail) ?: throw UserNotFoundException()
+        val forgottenPasswordToken = forgottenPasswordTokenRepository.save(ForgottenPasswordToken(user = user))
+
+        sendPasswordResetMail(user, forgottenPasswordToken)
+    }
 
     private fun createAndSaveActivationKey(user: User): ActivationKey {
         return activationKeyRepository.save(ActivationKey(user = user))
@@ -96,6 +117,24 @@ open class UserService(
                 Hello,
 
                 An account has been created using this mail address, go to ${applicationProperties.mail.server.url}/users/activate/${activationKey.id} to activate it!
+
+                Have a nice day.
+            """.trimIndent()
+        )
+
+        mailService.sendMail(mail)
+    }
+
+    private fun sendPasswordResetMail(user: User, forgottenPasswordToken: ForgottenPasswordToken) {
+        val mail = MailDto(
+            from = applicationProperties.mail.server.mailAddress,
+            to = user.mail!!,
+            subject = "Password reset request",
+            content =
+            """
+                Hello,
+
+                A password reset has been request for this address, go to ${applicationProperties.mail.server.url}/users/forgotten/${forgottenPasswordToken.id} to set a new one!
 
                 Have a nice day.
             """.trimIndent()

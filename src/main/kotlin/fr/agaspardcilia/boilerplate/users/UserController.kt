@@ -1,5 +1,6 @@
 package fr.agaspardcilia.boilerplate.users
 
+import fr.agaspardcilia.boilerplate.users.dto.ForgottenPasswordDto
 import fr.agaspardcilia.boilerplate.users.dto.PasswordChangeDto
 import fr.agaspardcilia.boilerplate.users.dto.UserCreationDto
 import fr.agaspardcilia.boilerplate.users.dto.UserDto
@@ -56,5 +57,17 @@ class UserController(
     fun changePassword(@RequestBody @Valid passwordChangeDto: PasswordChangeDto) {
         log.info("Attempting to change ${passwordChangeDto.username}'s password")
         userService.changePassword(passwordChangeDto)
+    }
+
+    @PutMapping("/reset")
+    fun resetPassword(@RequestBody @Valid passwordResetDto: ForgottenPasswordDto) {
+        log.info("Attempting to change a forgotten password with ${passwordResetDto.token} as the token")
+        userService.changePassword(passwordResetDto)
+    }
+
+    @PostMapping("/forgotten/{mail}")
+    fun requestPasswordReset(@PathVariable("mail") mail: String) {
+        log.info("Requesting password reset for $mail")
+        userService.createPasswordResetTokenAndSendMail(mail)
     }
 }
