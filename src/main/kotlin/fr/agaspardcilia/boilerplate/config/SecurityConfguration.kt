@@ -24,7 +24,7 @@ import javax.annotation.PostConstruct
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-open class SecurityConfiguration(
+class SecurityConfiguration(
     private val tokenProvider: TokenProvider,
     private val corsFilter: CorsFilter,
     private val authenticationManagerBuilder: AuthenticationManagerBuilder,
@@ -32,7 +32,7 @@ open class SecurityConfiguration(
 ) : WebSecurityConfigurerAdapter() {
 
     @PostConstruct
-    open fun init() {
+    fun init() {
         try {
             authenticationManagerBuilder
                 .userDetailsService(userDetailsService)
@@ -43,7 +43,7 @@ open class SecurityConfiguration(
     }
 
     @Bean
-    open fun passwordEncoder() = BCryptPasswordEncoder()
+    fun passwordEncoder() = BCryptPasswordEncoder()
 
     override fun configure(web: WebSecurity?) {
         web!!.ignoring()
